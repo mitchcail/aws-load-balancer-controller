@@ -103,7 +103,12 @@ func (r *serviceReconciler) reconcile(ctx context.Context, req ctrl.Request) err
 }
 
 func (r *serviceReconciler) buildModel(ctx context.Context, svc *corev1.Service) (core.Stack, *elbv2model.LoadBalancer, error) {
+	r.logger.Info("in Service.buildModel", "-", "-")
+	svcJSON, err := r.stackMarshaller.Marshal(svc)
+	r.logger.Info("service", "svc", svcJSON)
 	stack, lb, err := r.modelBuilder.Build(ctx, svc)
+	lbJSON, err := r.stackMarshaller.Marshal(lb)
+	r.logger.Info("This is the LB", "lb", lbJSON)
 	if err != nil {
 		r.eventRecorder.Event(svc, corev1.EventTypeWarning, k8s.ServiceEventReasonFailedBuildModel, fmt.Sprintf("Failed build model due to %v", err))
 		return nil, nil, err
